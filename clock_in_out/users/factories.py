@@ -7,7 +7,7 @@ faker = Factory.create()
 
 
 class BaseUserFactory(factory.DjangoModelFactory):
-    email = faker.Sequence(lambda n: f'{n}{faker.email()}')
+    email = factory.Sequence(lambda n: f'{n}{faker.email()}')
     full_name = factory.LazyAttribute(lambda _: faker.name())
     password = faker.password()
 

@@ -17,6 +17,7 @@ django-test-plus = "*"
 django = "*"
 djangorestframework = "*"
 django-environ = "*"
+djangorestframework-jwt = "*"
 
 [requires]
 python_version = "3.7"

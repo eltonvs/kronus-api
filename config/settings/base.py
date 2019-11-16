@@ -1,3 +1,5 @@
+import datetime
+
 import environ
 
 BASE_DIR = environ.Path(__file__) - 3  # (clock-in-out-api/config/settings/base.py - 3 = clock-in-out-api/)
@@ -54,6 +56,15 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': False,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_ALLOW_REFRESH': False,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_GET_USER_SECRET_KEY': lambda user: user.secret_key,
+}
 
 TEMPLATES = [
     {
