@@ -57,6 +57,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = True
+
 JWT_AUTH = {
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': False,
