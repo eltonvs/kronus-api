@@ -15,6 +15,14 @@ class ClockEntry(UpdatedAtCreatedAtModelMixin):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        if self.clock_in is not None:
+            open_clock_ins = ClockEntry.objects.filter(user=self.user, clock_in=None, clock_out=None)
+            if open_clock_ins.exists():
+                raise ValidationError('You can not delete a Clock-out event when an open clock-in exists')
+
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         clock_type = 'in' if self.clock_in is None else 'out'
         return f'Clock-{clock_type} from {self.user} on {self.time}'
@@ -26,23 +34,24 @@ class ClockEntry(UpdatedAtCreatedAtModelMixin):
         is_clock_in = self.clock_in is None
         if is_clock_in:
             # we can only create a new clock-in if there's no "open" clock-in
-            open_clock_ins = ClockEntry.objects.filter(user=self.user, clock_in=None, clock_out=None)
+            open_clock_ins = ClockEntry.objects.filter(
+                user=self.user, clock_in=None, clock_out=None
+            ).exclude(pk=self.pk)
             if open_clock_ins.exists():
                 raise ValidationError('There is already another clock-in without a clock-out')
             # the clock-in can't overlap with other clock-in/out intervals
             interval_query = ClockEntry.objects.filter(
                 user=self.user, clock_in=None, time__lte=self.time, clock_out__time__gte=self.time
-            )
+            ).exclude(pk=self.pk)
             if interval_query.exists():
                 raise ValidationError('The clock time is overlapping with another clock-in/out')
         else:
-            # the clock-out can't be after the clock-in
             # the clock-out can't be after the clock-in
             if self.time <= self.clock_in.time:
                 raise ValidationError('The clock-out time can not be before the clock-in time')
             # the clock-out can't be after the next clock-in
             query = ClockEntry.objects.filter(
                 user=self.user, clock_in=None, time__gt=self.clock_in.time, time__lte=self.time
-            )
+            ).exclude(pk=self.pk)
             if query.exists():
                 raise ValidationError('The clock-out can not be after the next clock-in')

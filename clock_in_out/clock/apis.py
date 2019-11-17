@@ -4,10 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from clock_in_out.apis.mixins import ServiceExceptionHandlerMixin
-from clock_in_out.authentication.permissions import \
-    JSONWebTokenAuthenticationMixin
+from clock_in_out.authentication.permissions import JSONWebTokenAuthenticationMixin
 from clock_in_out.clock.models import ClockEntry
-from clock_in_out.clock.services import create_clock_in, create_clock_out
+from clock_in_out.clock.services import create_clock_in, create_clock_out, update_clock_entry
 
 
 class ClockInApi(JSONWebTokenAuthenticationMixin, ServiceExceptionHandlerMixin, APIView):
@@ -67,3 +66,43 @@ class ClockLogApi(JSONWebTokenAuthenticationMixin, ServiceExceptionHandlerMixin,
         user = self.request.user
 
         return ClockEntry.objects.filter(user=user).order_by('time')
+
+
+class ChangeClockEntryApi(JSONWebTokenAuthenticationMixin, ServiceExceptionHandlerMixin, APIView):
+
+    class ClockEntrySerializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = ClockEntry
+            fields = (
+                'id',
+                'time',
+                'clock_in',
+                'clock_out',
+            )
+
+    class Serializer(serializers.Serializer):
+        time = serializers.DateTimeField()
+        out_pk = serializers.IntegerField(required=False, default=None, allow_null=True)
+        out_time = serializers.DateTimeField(required=False, default=None, allow_null=True)
+
+    def delete(self, request, pk):
+        user = request.user
+        clock_entry = ClockEntry.objects.get(user=user, pk=pk)
+        clock_entry.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, pk):
+        user = request.user
+        data = request.data
+        serializer = self.Serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        clock_in, clock_out = update_clock_entry(**{**serializer.validated_data, 'user': user, 'pk': pk})
+
+        data = {
+            'clock_in': self.ClockEntrySerializer(clock_in).data,
+            'clock_out': clock_out and self.ClockEntrySerializer(clock_out).data,
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
