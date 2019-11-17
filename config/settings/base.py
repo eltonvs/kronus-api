@@ -25,6 +25,8 @@ LOCAL_APPS = [
     'clock_in_out.common.apps.CommonConfig',
     'clock_in_out.apis.apps.ApisConfig',
     'clock_in_out.users.apps.UsersConfig',
+    'clock_in_out.authentication.apps.AuthenticationConfig',
+    'clock_in_out.clock.apps.ClockConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
