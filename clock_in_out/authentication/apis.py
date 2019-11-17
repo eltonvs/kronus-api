@@ -24,7 +24,7 @@ class LoginApi(ObtainJSONWebToken):
         full_data = get_user_data(user=user)
 
         response_data = jwt_response_payload_handler(token, user, request)
-        response_data.update({'me': full_data})
+        response_data.update({'user': full_data})
 
         return Response(response_data)
 
