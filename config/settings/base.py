@@ -2,6 +2,8 @@ import datetime
 
 import environ
 
+import django_heroku
+
 BASE_DIR = environ.Path(__file__) - 3  # (clock-in-out-api/config/settings/base.py - 3 = clock-in-out-api/)
 APP_DIRS = BASE_DIR.path('clock_in_out')
 
@@ -110,3 +112,5 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'users.BaseUser'
+
+django_heroku.settings(locals())
