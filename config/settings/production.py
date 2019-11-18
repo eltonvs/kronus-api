@@ -10,4 +10,6 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')  # noqa: F405
 # ------------------------------------------------------------------------------
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost'])  # noqa: F405
+ALLOWED_HOSTS = env.list(  # noqa: F405
+    'DJANGO_ALLOWED_HOSTS', default=['localhost', 'https://kronus-api.herokuapp.com/']
+)
